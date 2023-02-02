@@ -1,4 +1,4 @@
-pipeline{
+pipeline {
   agent {
     node {
       label 'nodejs-node'
@@ -14,6 +14,12 @@ pipeline{
         }
       }
     }
-    
+    stage('SonarQube analysis') {
+      steps {
+        withSonarQubeEnv(credentialsId: 'sonarqube-credentials', installationName: 'sonarqube-server'){
+          sh 'mvn clean verify sonar:sonar -DskipTests'
+        }
+      }
+    }
   }
 }

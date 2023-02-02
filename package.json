@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
+    "sonarqube-scanner": "2.8.2",
     "@angular/animations": "^14.0.0",
     "@angular/common": "^14.0.0",
     "@angular/compiler": "^14.0.0",
@@ -22,10 +23,10 @@
     "bootstrap": "^4.6.1",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.11.4",
-    "sonarqube-scanner": "2.8.2",
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
+    "sonarqube-scanner": "2.8.2",
     "@angular-devkit/build-angular": "^14.0.2",
     "@angular/cli": "~14.0.2",
     "@angular/compiler-cli": "^14.0.0",
