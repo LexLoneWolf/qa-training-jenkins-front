@@ -5,6 +5,13 @@ pipeline {
     }
   }
 
+  environment {
+    registryCredential = 'docker-hub-credentials'
+    registryFrontend = 'lexlonewolf/frontend-demo'
+    sonarqubeCredentials = 'sonarqube-credentials'
+    sonarqubeServer = 'sonarqube-server'
+  }
+
   stages {
     stage('NPM build') {
       steps {
@@ -16,16 +23,16 @@ pipeline {
     }
     stage('SonarQube analysis') {
       steps {
-        withSonarQubeEnv(credentialsId: 'sonarqube-credentials', installationName: 'sonarqube-server'){
+        withSonarQubeEnv(credentialsId: sonarqubeCredentials, installationName: sonarqubeServer) {
           sh 'npm run sonar'
         }
       }
     }
     stage('Quality Gate') {
       steps {
-        timeout(time: 10, unit: "MINUTES") {
+        timeout(time: 10, unit: 'MINUTES') {
           script {
-            def qg = waitForQualityGate(webhookSecretId: 'sonarqube-credentials')
+            def qg = waitForQualityGate(webhookSecretId: sonarqubeCredentials)
             if (qg.status != 'OK') {
               error "Pipeline aborted due to quality gate failure: ${qg.status}"
             }
@@ -33,5 +40,21 @@ pipeline {
         }
       }
     }
+    stage('Push Image latest to Docker Hub') {
+      steps {
+        script {
+          dockerImage = docker.build registryFrontend + ':latest'
+          docker.withRegistry('', registryCredential) {
+            dockerImage.push()
+          }
+        }
+      }
+    }
   }
+  post {
+    always {
+      sh "docker logout"
+      sh "docker rmi -f " + registryFrontend + ":latest"
+    }
+   }
 }
